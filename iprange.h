@@ -22,7 +22,11 @@ class IPRange {
       // returns error code
       int add(const char* ipaddr);
       bool includes(const char* ipaddr);
+
    private:
+      char** ipToArray(char *str);
+      Range** generateRanges (char** ipArray);
+
       std::vector<std::vector<Range*> > fullRange;
       short int r_size;
 };
