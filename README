@@ -1,0 +1,7 @@
+iprange
+By Robert Massaioli
+
+Purpose
+
+The purpose of this library is to provide a way to add ranges of IP's to an object
+and then retrieve wether or not an IP address is in that range.
