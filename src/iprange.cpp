@@ -7,7 +7,17 @@
 
 using namespace std;
 
+//
+// Helper Function Definitions
+//
+
 static char* fromConstChar (const char* str);
+template <class T>
+static bool isInside(vector<Unit<T>* >* unit, vector<T>* test);
+
+//
+// Implementation of Class Functions
+//
 
 template <class T>
 IPRange<T>::~IPRange() {
@@ -46,8 +56,7 @@ int IPRange<T>::add(const char* ipaddr) {
       cout << *(Unit<T>*)*riter << endl;
    }
    // add the new result to the list
-   delete ranges;
-
+   fullRange.push_back(ranges);
    isDirty = true;
 
    return SUCCESSFUL_ADD;
@@ -55,16 +64,32 @@ int IPRange<T>::add(const char* ipaddr) {
 
 template <class T>
 bool IPRange<T>::includes(const char* idaddr) {
-   // break the address up into its parts (no ranges)
-   // search through the tree for a match
-   return false;
-}
+   if (isDirty) {
+      // sort the data
+   }
 
-static char* fromConstChar (const char* str) {
-   short int strLen = strlen(str);
-   char *newstr = (char*)malloc(strLen + 1);
-   strncpy(newstr, str, strLen + 1);
-   return newstr;
+   // break the address up into its parts (no ranges)
+   char* idadd = fromConstChar(idaddr);
+   char* tok = strtok(idadd, ".:");
+   int temp;
+   vector<T> units;
+   units.clear();
+   while(tok != NULL) {
+      if (!isdigit(*tok)) return false;
+      temp = atoi(tok);
+      if (temp == INT_MAX || temp == INT_MIN) return false;
+      units.push_back((T)temp);
+      tok = strtok(NULL, ".:");
+   }
+   free (idadd);
+
+   // search through the tree for a match
+   typename vector<vector<Unit<T>* >* >::iterator fullIter;
+   for(fullIter = fullRange.begin(); fullIter != fullRange.end(); fullIter++) {
+      if (isInside(*fullIter, &units)) return true;
+   }
+
+   return false;
 }
 
 template <class T>
@@ -141,4 +166,28 @@ vector<Unit<T>*>* IPRange<T>::generateRanges (vector<char*>* ipArray) {
    }
 
    return ranges;
+}
+
+//
+// Implmentation of the Helper Functions
+//
+
+static char* fromConstChar (const char* str) {
+   short int strLen = strlen(str);
+   char *newstr = (char*)malloc(strLen + 1);
+   strncpy(newstr, str, strLen + 1);
+   return newstr;
+}
+
+template <class T>
+static bool isInside(vector<Unit<T>* >* unit, vector<T>* test) {
+   typename vector<Unit<T>* >::const_iterator unit_iter = unit->begin();
+   typename vector<T>::const_iterator test_iter = test->begin();
+
+   while (unit_iter != unit->end() && test_iter != test->end()) {
+      if (*test_iter < (*unit_iter)->min() || *test_iter > (*unit_iter)->max()) return false;
+      test_iter++; 
+      unit_iter++;
+   }
+   return true;
 }

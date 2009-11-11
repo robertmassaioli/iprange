@@ -1,5 +1,5 @@
 CC=c++
-CF=-Wall -Werror -g -O3
+CF=-Wall -Werror -g -O0
 LD=
 name=iprange.bin
 
