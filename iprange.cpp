@@ -9,11 +9,8 @@ using namespace std;
 
 static char* fromConstChar (const char* str);
 
-IPRange::IPRange(int rangeSize) {
-   r_size = rangeSize;
-}
-
-int IPRange::add(const char* ipaddr) {
+template <class T>
+int IPRange<T>::add(const char* ipaddr) {
    cout << "\nAdding..." << endl;
    // converting from a const char* to a char*
    char *ipadd = fromConstChar(ipaddr);
@@ -22,11 +19,14 @@ int IPRange::add(const char* ipaddr) {
    char** gaps = ipToArray(ipadd);
    free(ipadd);
 
-   Range** ranges = generateRanges(gaps);
+   Unit<T>** ranges = generateRanges(gaps);
+   for (int i = 0; i < r_size; i++) {
+      free(gaps[i]);
+   }
    free(gaps);    // dont need the gaps anymore
 
    for (int i = 0; i < r_size; i++) {
-      cout << "(" << (int)ranges[i]->start << ", " << (int)ranges[i]->end << ")" << endl;
+      cout << *ranges[i] << endl;
    }
    // add the ranges up into the tree and merge where required
    //
@@ -34,7 +34,8 @@ int IPRange::add(const char* ipaddr) {
    return SUCCESSFUL_ADD;
 }
 
-bool IPRange::includes(const char* idaddr) {
+template <class T>
+bool IPRange<T>::includes(const char* idaddr) {
    // break the address up into its parts (no ranges)
    // search through the tree for a match
    return false;
@@ -47,7 +48,8 @@ static char* fromConstChar (const char* str) {
    return newstr;
 }
 
-char** IPRange::ipToArray(char *str) {
+template <class T>
+char** IPRange<T>::ipToArray(char *str) {
    char *tok = NULL;
    char **gaps = (char**)malloc (sizeof(char*) * r_size);
    short int i = 0;
@@ -65,20 +67,22 @@ char** IPRange::ipToArray(char *str) {
    return gaps;
 }
 
-Range** IPRange::generateRanges (char** ipArray) {
+template <class T>
+Unit<T>** IPRange<T>::generateRanges (char** ipArray) {
    int i;
    char* tok;
-   Range** ranges = new Range*[r_size];
-   Range* tempRange = NULL;
+   Unit<T>** ranges = new Unit<T>*[r_size];
+   Unit<T>* tempRange = NULL;
    int minIn, maxIn;
    minIn = maxIn = 0;
    for (i = 0; i < r_size; i++) {
+      tempRange = NULL;
       if (isdigit(*ipArray[i])) {
          minIn = atoi(ipArray[i]);
-         if (minIn == INT_MAX || minIn == INT_MIN) return NULL;// return INVALID_NAN;
-         if (minIn < 0 || minIn > 0xFF)return NULL;// return INVALID_NOT_IN_RANGE;
-         tempRange = new Range((char)minIn, (char)minIn);
-      } else {
+         if (minIn == INT_MAX || minIn == INT_MIN) continue;// return INVALID_NAN;
+         if (minIn < 0 || minIn > 0xFF) continue;// return INVALID_NOT_IN_RANGE;
+         tempRange = new Single<T>(minIn);
+      } else if (*ipArray[i] == '[') {
          tok = strtok(ipArray[i], "[]-");
          minIn = -1;
          while (NULL != tok) {
@@ -93,7 +97,11 @@ Range** IPRange::generateRanges (char** ipArray) {
          if (minIn == INT_MAX || minIn == INT_MIN) return NULL;// return INVALID_NAN;
          if (maxIn < 0 || maxIn > 0xFF) return NULL;// return INVALID_NOT_IN_RANGE;
          if (minIn < 0 || minIn > 0xFF) return NULL;// return INVALID_NOT_IN_RANGE;
-         tempRange = new Range((char)minIn, (char)maxIn);
+         tempRange = new Range<T>(minIn, maxIn);
+      } else if (*ipArray[i] == '*') {
+         // this is the whole range
+      } else {
+         // throw an error here
       }
       ranges[i] = tempRange;
    }
