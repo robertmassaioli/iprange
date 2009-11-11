@@ -1,7 +1,7 @@
 CC=c++
 CF=-Wall -Werror -g -O3
 LD=
-name=iprange
+name=iprange.bin
 
 all: main.o
 	$(CC) $(CF) $(LD) -o $(name) main.o
