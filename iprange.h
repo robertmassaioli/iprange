@@ -48,6 +48,13 @@ class Range : public Unit<T> {
 };
 
 template <class T>
+class FullRange : public Unit<T> {
+   public:
+      T min(void) {return (T)0;}
+      T max(void) {return ~((T)0);}
+};
+
+template <class T>
 class IPRange {
    public:
       IPRange () {r_size = sizeof(T) * 4;}
