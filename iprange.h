@@ -4,15 +4,12 @@
 #include <vector>
 #include <iostream>
 
-#define IPRANGE_SIZE_IPV4  4
-#define IPRANGE_SIZE_IPV6  8
-
 #define SUCCESSFUL_ADD        0
 #define INVALID_NAN           1
 #define INVALID_NOT_IN_RANGE  2
 
-typedef unsigned char IPV4_t;
-typedef short int IPV6_t;
+typedef unsigned char      IPV4_t;
+typedef unsigned short int IPV6_t;
 
 template <class T>
 class Unit {
@@ -58,16 +55,19 @@ template <class T>
 class IPRange {
    public:
       IPRange () {r_size = sizeof(T) * 4;}
+      ~IPRange();
       // returns error code
       int add(const char* ipaddr);
       bool includes(const char* ipaddr);
 
    private:
-      char** ipToArray(char *str);
-      Unit<T>** generateRanges (char** ipArray);
+      std::vector<char*>* ipToArray(char *str);
+      std::vector<Unit<T>* >* generateRanges (std::vector<char*>* ipArray);
 
-      std::vector<std::vector<Unit<T>*> > fullRange;
+      std::vector<std::vector<Unit<T>* >* > fullRange;
       short int r_size;
+
+      bool isDirty;
 };
 
 #include "iprange.cpp"
