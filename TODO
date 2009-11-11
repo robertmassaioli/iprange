@@ -1,0 +1,7 @@
+ToDo
+
+Add proper error handling
+Write the code to use vectors not pointers to pointers
+Make the sort happen whenever the search is performed only is it has not been performed already.
+
+Done
