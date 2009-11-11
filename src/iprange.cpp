@@ -34,7 +34,6 @@ IPRange<T>::~IPRange() {
 
 template <class T>
 int IPRange<T>::add(const char* ipaddr) {
-   cout << "\nAdding " << ipaddr << "..." << endl;
    // converting from a const char* to a char*
    char *ipadd = fromConstChar(ipaddr);
 
@@ -42,19 +41,20 @@ int IPRange<T>::add(const char* ipaddr) {
    vector<char*>* gaps = ipToArray(ipadd);
    free(ipadd);
 
-   vector<Unit<T>*>* ranges = generateRanges(gaps);
+   if ((short int)gaps->size() != r_size) throw INVALID_SIZE_ADDRESS;
+
+   vector<Unit<T>*>* ranges = NULL;
+   try {
+      ranges = generateRanges(gaps);
+   } catch (IPRange<T>::iprError error) {
+      throw; // catch this error and throw it again
+   }
    typename vector<char*>::iterator citer;
    for (citer = gaps->begin(); citer != gaps->end(); citer++) {
       free(*citer);
    }
    delete gaps;    // dont need the gaps anymore
 
-   typename vector<Unit<T>*>::iterator riter;
-   cout << "r_size: " << r_size << endl;
-   cout << "Size: " << ranges->size() << endl;
-   for (riter = ranges->begin(); riter != ranges->end(); riter++) {
-      cout << *(Unit<T>*)*riter << endl;
-   }
    // add the new result to the list
    fullRange.push_back(ranges);
    isDirty = true;
@@ -75,9 +75,9 @@ bool IPRange<T>::includes(const char* idaddr) {
    vector<T> units;
    units.clear();
    while(tok != NULL) {
-      if (!isdigit(*tok)) return false;
+      if (!isdigit(*tok)) throw INVALID_NAN;
       temp = atoi(tok);
-      if (temp == INT_MAX || temp == INT_MIN) return false;
+      if (temp == INT_MAX || temp == INT_MIN) throw INVALID_NAN;
       units.push_back((T)temp);
       tok = strtok(NULL, ".:");
    }
@@ -126,8 +126,8 @@ vector<Unit<T>*>* IPRange<T>::generateRanges (vector<char*>* ipArray) {
       tempRange = NULL;
       if (isdigit(*(*citer))) {
          minIn = atoi(*citer);
-         if (minIn == INT_MAX || minIn == INT_MIN) continue;// return INVALID_NAN;
-         if (minIn < 0 || minIn > 0xFF) continue;// return INVALID_NOT_IN_RANGE;
+         if (minIn == INT_MAX || minIn == INT_MIN) throw INVALID_NAN;
+         if (minIn < 0 || minIn > 0xFF) throw INVALID_RANGE;
          tempRange = new Single<T>(minIn);
       } else if (*(*citer) == '[') {
          tok = strtok(*citer, "[]-");
@@ -151,16 +151,15 @@ vector<Unit<T>*>* IPRange<T>::generateRanges (vector<char*>* ipArray) {
             tok = strtok(NULL, "[]-");
          }
          // all of these return NULL's should be thrown errors
-         if (maxIn == INT_MAX || maxIn == INT_MIN) return NULL;// return INVALID_NAN;
-         if (minIn == INT_MAX || minIn == INT_MIN) return NULL;// return INVALID_NAN;
-         if ((T)maxIn < (T)minIn) return NULL;
+         if (maxIn == INT_MAX || maxIn == INT_MIN) throw INVALID_NAN;
+         if (minIn == INT_MAX || minIn == INT_MIN) throw INVALID_NAN;
+         if ((T)maxIn < (T)minIn) throw INVALID_RANGE;
          tempRange = new Range<T>(minIn, maxIn);
       } else if (*(*citer) == '*') {
          // this is the whole range
          tempRange = new FullRange<T>();
       } else {
-         // throw an error here
-         cout << "Error Place 2" << endl;
+         throw INVALID_NAN;
       }
       ranges->push_back(tempRange);
    }

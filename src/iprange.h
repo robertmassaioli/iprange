@@ -4,10 +4,6 @@
 #include <vector>
 #include <iostream>
 
-#define SUCCESSFUL_ADD        0
-#define INVALID_NAN           1
-#define INVALID_NOT_IN_RANGE  2
-
 typedef unsigned char      IPV4_t;
 typedef unsigned short int IPV6_t;
 
@@ -59,6 +55,14 @@ class IPRange {
       // returns error code
       int add(const char* ipaddr);
       bool includes(const char* ipaddr);
+
+      enum iprError {
+         SUCCESSFUL_ADD = 0,
+         INVALID_NAN,
+         INVALID_RANGE,
+         INVALID_SIZE_ADDRESS,
+         LARGEST_ERROR
+      };
 
    private:
       std::vector<char*>* ipToArray(char *str);
