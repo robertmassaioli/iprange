@@ -1,6 +1,7 @@
 #ifndef __IPRANGE_DS__
 #define __IPRANGE_DS__
 
+#include <string>
 #include <vector>
 #include <iostream>
 
@@ -53,8 +54,8 @@ class IPRange {
       IPRange () {r_size = sizeof(T) * 4;}
       ~IPRange();
       // returns error code
-      int add(const char* ipaddr);
-      bool includes(const char* ipaddr);
+      int add(std::string& ipaddr);
+      bool includes(std::string& ipaddr);
 
       enum iprError {
          SUCCESSFUL_ADD = 0,
@@ -65,15 +66,13 @@ class IPRange {
       };
 
    private:
-      std::vector<char*>* ipToArray(char *str);
-      std::vector<Unit<T>* >* generateRanges (std::vector<char*>* ipArray);
+      std::vector<std::string*>* ipToArray(std::string& str);
+      std::vector<Unit<T>* >* generateRanges (std::vector<std::string*>* ipArray);
 
       std::vector<std::vector<Unit<T>* >* > fullRange;
       short int r_size;
-
-      bool isDirty;
 };
 
-#include "iprange.cpp"
+#include "iprange.tcc"
 
 #endif

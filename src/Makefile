@@ -1,12 +1,12 @@
-CC=c++
-CF=-Wall -Werror -g -O3
-LD=
+CC=g++
+CF=-Wall -Werror -g -O0 -fmudflap 
+LDFLAGS=-lmudflap
 name=iprange.bin
 
 all: main.o
-	$(CC) $(CF) $(LD) -o $(name) main.o
+	$(CC) $(LDFLAGS) -o $(name) main.o
 
-main.o: main.cpp iprange.h iprange.cpp
+main.o: main.cpp iprange.h iprange.tcc
 	$(CC) -c $(CF) main.cpp
 
 clean: tidy
