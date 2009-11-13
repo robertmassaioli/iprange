@@ -29,8 +29,7 @@ int main(int argc, char **argv) {
    errorMessages.push_back("the address contained too many parts.");
    errorMessages.push_back("An error ocurred but its message was not defined; please make sure the syntax of your allowed ip adresses is correct.");
 
-   vector<string>::iterator addr_iter;
-   for (addr_iter = addrs.begin(); addr_iter != addrs.end(); ++addr_iter) {
+   for (vector<string>::iterator addr_iter = addrs.begin(); addr_iter != addrs.end(); ++addr_iter) {
       try {
          ipr.add(*addr_iter);
       } catch (IPRange<IPV4_t>::iprError error) {
@@ -49,8 +48,7 @@ int main(int argc, char **argv) {
    testStrings.push_back(string("128.255.0.97"));
 
    cout << "Results:" << endl;
-   vector<string>::iterator sv;
-   for (sv = testStrings.begin(); sv != testStrings.end(); ++sv) {
+   for (vector<string>::iterator sv = testStrings.begin(); sv != testStrings.end(); ++sv) {
       cout << *sv << " is " << ipr.includes(*sv) << endl; 
    }
    cout << endl;

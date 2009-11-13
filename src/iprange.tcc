@@ -54,8 +54,7 @@ int IPRange<T>::add(string& ipadd) {
       delete gaps;
       throw; // catch this error and throw it again
    }
-   typename vector<string*>::iterator citer;
-   for (citer = gaps->begin(); citer != gaps->end(); ++citer) {
+   for (typename vector<string*>::iterator citer = gaps->begin(); citer != gaps->end(); ++citer) {
       delete *citer;
    }
    delete gaps;    // dont need the gaps anymore
@@ -85,8 +84,7 @@ bool IPRange<T>::includes(string& idadd) {
    delete[] cstr_idadd;
 
    // search through the tree for a match
-   typename vector<vector<Unit<T>* >* >::iterator fi;
-   for(fi = fullRange.begin(); fi != fullRange.end(); ++fi) {
+   for(typename vector<vector<Unit<T>* >* >::iterator fi = fullRange.begin(); fi != fullRange.end(); ++fi) {
       if (isInside(*fi, &units)) return true;
    }
 
@@ -122,9 +120,8 @@ vector<Unit<T>*>* IPRange<T>::generateRanges (vector<string*>* ipArray) {
    Unit<T>* tempRange = NULL;
    int minIn, maxIn;
    minIn = maxIn = 0;
-   vector<string*>::iterator citer;
    char firstChar = 0;
-   for (citer = ipArray->begin(); citer != ipArray->end(); ++citer) {
+   for (vector<string*>::iterator citer = ipArray->begin(); citer != ipArray->end(); ++citer) {
       firstChar = (*(*citer))[0];
       if (isdigit(firstChar)) {
          minIn = atoi((*citer)->data());
