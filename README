@@ -6,11 +6,11 @@ Purpose
    The purpose of this library is to provide a way to add ranges of IP's to an object
    and then retrieve wether or not an IP address is in that range. This project is supposed
    to be robust and be able to handle bad input in nice ways as well as being easily able to
-   hande both IPv4 and IPv6 adresses.
+   hande both IPv4 and IPv6 adresses. (NOTE: Currently only IPv4 adresses are supported)
 
 Adding to a project
 
-   Currently just make sure that iprange.(cpp|h) are in your include path and say:
+   Currently just make sure that iprange.(tcc|h) are in your include path and say:
 
       #include <iprange.h>
 
@@ -31,7 +31,15 @@ Adding to a project
          cout << "Dang, it's not." << endl;
       }
 
-   And that's all there is too it.
+   And that's all there is to it.
+
+Functions Provided
+
+   add         - add a new IP range
+   includes    - is an ip included in any of the ranges
+   size        - how many ranges does the object have
+   clear       - remove and free all ranges from the object
+   <<          - output the object to an ostream
 
 Technical Details
 

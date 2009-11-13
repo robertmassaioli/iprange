@@ -1,8 +1,9 @@
 ToDo
 
-Make the sort happen whenever the search is performed only is it has not been performed already.
+Add enough functionality that you can merge this project into fuppes.
+Add better error handling everywhere; make it rock solid.
+Search for and remove and and all memory leaks.
 
 Done
 
-Add proper error handling
 Write the code to use vectors not pointers to pointers
