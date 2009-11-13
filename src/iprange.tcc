@@ -51,7 +51,7 @@ int IPRange<T>::add(string& ipadd) {
    try {
       ranges = generateRanges(gaps);
    } catch (IPRange<T>::iprError error) {
-      if (gaps != NULL) delete gaps;
+      delete gaps;
       throw; // catch this error and throw it again
    }
    typename vector<string*>::iterator citer;

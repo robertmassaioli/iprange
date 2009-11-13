@@ -34,8 +34,9 @@ int main(int argc, char **argv) {
       try {
          ipr.add(*addr_iter);
       } catch (IPRange<IPV4_t>::iprError error) {
-         cout << "Error: " << *addr_iter << " ";
-         cout << errorMessages.at((int)error) << endl;
+         cout  
+            << "Error: " << *addr_iter << " "
+            << errorMessages.at((int)error) << endl;
       }
    }
 
