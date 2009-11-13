@@ -39,7 +39,7 @@ int main(int argc, char **argv) {
       }
    }
 
-   cout << "IPRange object:" << endl;
+   cout << "IPRange object: (" << ipr.size() << ")" <<  endl;
    cout << ipr << endl;
 
    vector<string> testStrings;

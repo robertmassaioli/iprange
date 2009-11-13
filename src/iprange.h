@@ -51,7 +51,18 @@ class IPRange {
       int add(std::string& ipaddr);
       bool includes(std::string& ipaddr);
       int size(void) { return fullRange.size(); }
+
+      // the get and remove functions (for compatibility with fuppes)
       const std::vector<Unit<T>*>* get(int i) { return (const std::vector<Unit<T>*>*)fullRange.at(i); }
+      void remove(int i) {
+         std::vector<Unit<T>*>* vec = fullRange.at(i);
+         while (!vec->empty()) {
+            delete vec->back();
+            vec->pop_back();
+         }
+         fullRange.erase(fullRange.begin() + i);
+         delete vec;
+      }
       void clear(void);
 
       enum iprError {
