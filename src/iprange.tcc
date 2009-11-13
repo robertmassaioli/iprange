@@ -45,13 +45,23 @@ int IPRange<T>::add(string& ipadd) {
    // breaking the string up by . separators
    vector<string*>* gaps = ipToArray(ipadd);
 
-   if (gaps == NULL || (short int)gaps->size() != r_size) throw INVALID_SIZE_ADDRESS;
+   if (gaps == NULL || (short int)gaps->size() != r_size) {
+      for (typename vector<string*>::iterator citer = gaps->begin(); citer != gaps->end(); ++citer) {
+         delete *citer;
+      }
+      delete gaps;
+      throw INVALID_SIZE_ADDRESS;
+   }
 
    vector<Unit<T>*>* ranges = NULL;
    try {
       ranges = generateRanges(gaps);
    } catch (IPRange<T>::iprError error) {
+      for (typename vector<string*>::iterator citer = gaps->begin(); citer != gaps->end(); ++citer) {
+         delete *citer;
+      }
       delete gaps;
+      delete ranges;
       throw; // catch this error and throw it again
    }
    for (typename vector<string*>::iterator citer = gaps->begin(); citer != gaps->end(); ++citer) {
@@ -125,8 +135,16 @@ vector<Unit<T>*>* IPRange<T>::generateRanges (vector<string*>* ipArray) {
       firstChar = (*(*citer))[0];
       if (isdigit(firstChar)) {
          minIn = atoi((*citer)->data());
-         if (minIn == INT_MAX || minIn == INT_MIN) throw INVALID_NAN;
-         if (minIn < 0 || minIn > 0xFF) throw INVALID_RANGE;
+         if (minIn == INT_MAX || minIn == INT_MIN) {
+            for (typename vector<Unit<T>*>::iterator iter = ranges->begin(); iter != ranges->end(); ++iter) { delete *iter; }
+            delete ranges;
+            throw INVALID_NAN;
+         }
+         if (minIn < 0 || minIn > 0xFF) {
+            for (typename vector<Unit<T>*>::iterator iter = ranges->begin(); iter != ranges->end(); ++iter) { delete *iter; }
+            delete ranges;
+            throw INVALID_RANGE;
+         }
          tempRange = new Single<T>(minIn);
       } else if (firstChar == '[') {
          char* tok;
@@ -156,17 +174,32 @@ vector<Unit<T>*>* IPRange<T>::generateRanges (vector<string*>* ipArray) {
          delete[] cstr_citer;
 
          // all of these return NULL's should be thrown errors
-         if (maxIn == INT_MAX || maxIn == INT_MIN) throw INVALID_NAN;
-         if (minIn == INT_MAX || minIn == INT_MIN) throw INVALID_NAN;
-         if ((T)maxIn < (T)minIn) throw INVALID_RANGE;
+         if (maxIn == INT_MAX || maxIn == INT_MIN) {
+            for (typename vector<Unit<T>*>::iterator iter = ranges->begin(); iter != ranges->end(); ++iter) { delete *iter; }
+            delete ranges;
+            throw INVALID_NAN;
+         }
+         if (minIn == INT_MAX || minIn == INT_MIN) {
+            for (typename vector<Unit<T>*>::iterator iter = ranges->begin(); iter != ranges->end(); ++iter) { delete *iter; }
+            delete ranges;
+            throw INVALID_NAN;
+         }
+         if ((T)maxIn < (T)minIn) {
+            for (typename vector<Unit<T>*>::iterator iter = ranges->begin(); iter != ranges->end(); ++iter) { delete *iter; }
+            delete ranges;
+            throw INVALID_RANGE;
+         }
          tempRange = new Range<T>(minIn, maxIn);
       } else if (firstChar == '*') {
          // this is the whole range
          tempRange = new FullRange<T>();
       } else {
+         for (typename vector<Unit<T>*>::iterator iter = ranges->begin(); iter != ranges->end(); ++iter) { delete *iter; }
+         delete ranges;
          throw INVALID_NAN;
       }
       ranges->push_back(tempRange);
+      tempRange = NULL;
    }
 
    return ranges;
@@ -177,11 +210,11 @@ vector<Unit<T>*>* IPRange<T>::generateRanges (vector<string*>* ipArray) {
 //
 
 /*static char* fromConstChar (const char* str) {
-   short int strLen = strlen(str);
-   char *newstr = (char*)malloc(strLen + 1);
-   strncpy(newstr, str, strLen + 1);
-   return newstr;
-}*/
+  short int strLen = strlen(str);
+  char *newstr = (char*)malloc(strLen + 1);
+  strncpy(newstr, str, strLen + 1);
+  return newstr;
+  }*/
 
 template <class T>
 static bool isInside(vector<Unit<T>* >* unit, vector<T>* test) {
