@@ -22,6 +22,11 @@ static bool isInside(vector<Unit<T>* >* unit, vector<T>* test);
 
 template <class T>
 IPRange<T>::~IPRange() {
+   clear();
+}
+
+template <class T>
+void IPRange<T>::clear(void) {
    vector<Unit<T>* >* temp;
 
    while(!fullRange.empty()) {

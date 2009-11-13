@@ -1,6 +1,6 @@
 CC=g++
-CF=-Wall -Werror -g -O0 -fmudflap 
-LDFLAGS=-lmudflap
+CF=-Wall -Werror -g -O0
+LDFLAGS=
 name=iprange.bin
 
 all: main.o

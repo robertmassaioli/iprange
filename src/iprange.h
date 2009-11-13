@@ -16,12 +16,6 @@ class Unit {
 };
 
 template <class T>
-std::ostream& operator<<(std::ostream& output, Unit<T>& u) {
-   output << "[" << (int)u.min() << "," << (int)u.max() << "]";
-   return output;
-}
-
-template <class T>
 class Single : public Unit<T> {
    public:
       Single(T s) {single = s;}
@@ -56,6 +50,9 @@ class IPRange {
       // returns error code
       int add(std::string& ipaddr);
       bool includes(std::string& ipaddr);
+      int size(void) { return fullRange.size(); }
+      const std::vector<Unit<T>*>* get(int i) { return (const std::vector<Unit<T>*>*)fullRange.at(i); }
+      void clear(void);
 
       enum iprError {
          SUCCESSFUL_ADD = 0,
@@ -72,6 +69,39 @@ class IPRange {
       std::vector<std::vector<Unit<T>* >* > fullRange;
       short int r_size;
 };
+
+//
+// The toString code
+//
+
+template <class T>
+std::ostream& operator<<(std::ostream& output, Unit<T>& u) {
+   if (u.min() == u.max()) {
+      output << (int)u.min();
+   } else {
+      output << "[" << (int)u.min() << "," << (int)u.max() << "]";
+   }
+   return output;
+}
+
+template <class T>
+std::ostream& operator<<(std::ostream& output, const std::vector<Unit<T>*>& ipar) {
+   for(typename std::vector<Unit<T>*>::const_iterator iter = ipar.begin(); iter != ipar.end(); ++iter) {
+      output << **iter;
+      if (iter + 1 != ipar.end()) {
+         output << ".";
+      }
+   }
+   return output;
+}
+
+template <class T>
+std::ostream& operator<<(std::ostream& output, IPRange<T>& ipr) {
+   for (int i = 0; i < ipr.size(); ++i) {
+      output << *ipr.get(i) << std::endl;
+   }
+   return output;
+}
 
 #include "iprange.tcc"
 
