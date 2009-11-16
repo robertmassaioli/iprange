@@ -15,6 +15,8 @@ using namespace std;
 //static char* fromConstChar (const char* str);
 template <class T>
 static bool isInside(vector<Unit<T>* >* unit, vector<T>* test);
+template <class T>
+static void deleteInsideVector(vector<T*>* deleteme);
 
 //
 // Implementation of Class Functions
@@ -46,10 +48,7 @@ int IPRange<T>::add(string& ipadd) {
    vector<string*>* gaps = ipToArray(ipadd);
 
    if (gaps == NULL || (short int)gaps->size() != r_size) {
-      for (typename vector<string*>::iterator citer = gaps->begin(); citer != gaps->end(); ++citer) {
-         delete *citer;
-      }
-      delete gaps;
+      deleteInsideVector(gaps);
       throw INVALID_SIZE_ADDRESS;
    }
 
@@ -57,17 +56,11 @@ int IPRange<T>::add(string& ipadd) {
    try {
       ranges = generateRanges(gaps);
    } catch (IPRange<T>::iprError error) {
-      for (typename vector<string*>::iterator citer = gaps->begin(); citer != gaps->end(); ++citer) {
-         delete *citer;
-      }
-      delete gaps;
+      deleteInsideVector(gaps);
       delete ranges;
       throw; // catch this error and throw it again
    }
-   for (typename vector<string*>::iterator citer = gaps->begin(); citer != gaps->end(); ++citer) {
-      delete *citer;
-   }
-   delete gaps;    // dont need the gaps anymore
+   deleteInsideVector(gaps);
    gaps = NULL;
 
    // add the new result to the list
@@ -136,13 +129,11 @@ vector<Unit<T>*>* IPRange<T>::generateRanges (vector<string*>* ipArray) {
       if (isdigit(firstChar)) {
          minIn = atoi((*citer)->data());
          if (minIn == INT_MAX || minIn == INT_MIN) {
-            for (typename vector<Unit<T>*>::iterator iter = ranges->begin(); iter != ranges->end(); ++iter) { delete *iter; }
-            delete ranges;
+            deleteInsideVector(ranges);
             throw INVALID_NAN;
          }
          if (minIn < 0 || minIn > 0xFF) {
-            for (typename vector<Unit<T>*>::iterator iter = ranges->begin(); iter != ranges->end(); ++iter) { delete *iter; }
-            delete ranges;
+            deleteInsideVector(ranges);
             throw INVALID_RANGE;
          }
          tempRange = new Single<T>(minIn);
@@ -175,18 +166,15 @@ vector<Unit<T>*>* IPRange<T>::generateRanges (vector<string*>* ipArray) {
 
          // all of these return NULL's should be thrown errors
          if (maxIn == INT_MAX || maxIn == INT_MIN) {
-            for (typename vector<Unit<T>*>::iterator iter = ranges->begin(); iter != ranges->end(); ++iter) { delete *iter; }
-            delete ranges;
+            deleteInsideVector(ranges);
             throw INVALID_NAN;
          }
          if (minIn == INT_MAX || minIn == INT_MIN) {
-            for (typename vector<Unit<T>*>::iterator iter = ranges->begin(); iter != ranges->end(); ++iter) { delete *iter; }
-            delete ranges;
+            deleteInsideVector(ranges);
             throw INVALID_NAN;
          }
          if ((T)maxIn < (T)minIn) {
-            for (typename vector<Unit<T>*>::iterator iter = ranges->begin(); iter != ranges->end(); ++iter) { delete *iter; }
-            delete ranges;
+            deleteInsideVector(ranges);
             throw INVALID_RANGE;
          }
          tempRange = new Range<T>(minIn, maxIn);
@@ -194,8 +182,7 @@ vector<Unit<T>*>* IPRange<T>::generateRanges (vector<string*>* ipArray) {
          // this is the whole range
          tempRange = new FullRange<T>();
       } else {
-         for (typename vector<Unit<T>*>::iterator iter = ranges->begin(); iter != ranges->end(); ++iter) { delete *iter; }
-         delete ranges;
+            deleteInsideVector(ranges);
          throw INVALID_NAN;
       }
       ranges->push_back(tempRange);
@@ -229,4 +216,13 @@ static bool isInside(vector<Unit<T>* >* unit, vector<T>* test) {
       ++unit_iter;
    }
    return true;
+}
+
+template <class T>
+static void deleteInsideVector(vector<T*>* deleteme) {
+   while (!deleteme->empty()) {
+      delete deleteme->back();
+      deleteme->pop_back();
+   }
+   delete deleteme;
 }
